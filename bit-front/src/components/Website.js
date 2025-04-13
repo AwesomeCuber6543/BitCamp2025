@@ -6,6 +6,8 @@ function Website() {
   const [showAddResourceModal, setShowAddResourceModal] = useState(false);
   const [newResourceName, setNewResourceName] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState({ text: '', isError: false });
   
   // Store resources as objects with name and data (if available)
   const [resources, setResources] = useState([
@@ -15,10 +17,41 @@ function Website() {
     { name: 'Price List.xlsx', type: 'spreadsheet', isPlaceholder: true }
   ]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Company Name:', companyName);
-    console.log('Company URL:', companyUrl);
+  const handleUpdateCompanyInfo = async () => {
+    setIsUpdating(true);
+    setUpdateMessage({ text: '', isError: false });
+    
+    try {
+      const response = await fetch('https://a116-65-113-61-98.ngrok-free.app/update_constants', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          new_url: companyUrl,
+          name_of_company: companyName
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setUpdateMessage({ text: data.message + 'Your custom phone number is +1 (833) 573-5835!', isError: false });
+      } else {
+        setUpdateMessage({ 
+          text: data.detail || 'Failed to update company information', 
+          isError: true 
+        });
+      }
+    } catch (error) {
+      setUpdateMessage({ 
+        text: 'Network error: Could not connect to the server', 
+        isError: true 
+      });
+      console.error('Error updating company info:', error);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -120,30 +153,39 @@ function Website() {
           
           <div className="form-group">
             <label htmlFor="companyName">Company Name</label>
-            <div className="input-group">
-              <input 
-                type="text" 
-                id="companyName"
-                placeholder="Enter your company name" 
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-              />
-              <button type="button" className="modern-button secondary">Update</button>
-            </div>
+            <input 
+              type="text" 
+              id="companyName"
+              placeholder="Enter your company name" 
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+            />
           </div>
           <div className="form-group">
             <label htmlFor="companyUrl">Company URL</label>
-            <div className="input-group">
-              <input 
-                type="url" 
-                id="companyUrl"
-                placeholder="Enter your website URL" 
-                value={companyUrl}
-                onChange={(e) => setCompanyUrl(e.target.value)}
-              />
-              <button type="button" className="modern-button secondary">Update</button>
-            </div>
+            <input 
+              type="url" 
+              id="companyUrl"
+              placeholder="Enter your website URL" 
+              value={companyUrl}
+              onChange={(e) => setCompanyUrl(e.target.value)}
+            />
           </div>
+          
+          <button 
+            type="button" 
+            className="modern-button primary full-width"
+            onClick={handleUpdateCompanyInfo}
+            disabled={isUpdating}
+          >
+            {isUpdating ? 'Updating...' : 'Update Company Information'}
+          </button>
+          
+          {updateMessage.text && (
+            <div className={`update-message ${updateMessage.isError ? 'error' : 'success'}`}>
+              {updateMessage.text}
+            </div>
+          )}
         </div>
 
         <div className="grid-item resources">

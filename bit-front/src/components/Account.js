@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 
 function Account() {
   const [profile, setProfile] = useState({
-    name: 'John Smith',
-    email: 'john.smith@example.com',
-    phone: '(555) 123-4567',
-    extension: '101',
-    company: 'Acme Corporation',
-    serviceNumber: '1-800-555-HELP'
+    name: 'Yahia Salman',
+    email: 'yahiasalman@gmail.com',
+    phone: '(443) 676-1199',
+    extension: '+1',
+    company: 'BITCAMP WINNERS',
+    serviceNumber: '+1 (833) 573-5835'
   });
   
   const [isEditing, setIsEditing] = useState(false);
