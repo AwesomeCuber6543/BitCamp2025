@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Login() {
   const navigate = useNavigate();
@@ -11,6 +11,9 @@ function Login() {
 
   return (
     <div className="login-page">
+      <div className="login-header">
+        <Link to="/" className="brand-link">Helpr</Link>
+      </div>
       <div className="login-container">
         <h1>Login</h1>
         <form className="login-form" onSubmit={handleSubmit}>

@@ -1,75 +1,23 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Outlet } from 'react-router-dom';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Website from './components/Website';
 import { useState, useEffect } from 'react';
 
-function NavBar() {
-  const navigate = useNavigate();
-  const isLoggedIn = window.location.pathname.includes('/dashboard');
-
-  // This function will be called when the logout button is clicked
-  function logoutAndRedirect() {
-    console.log("Logout clicked");
-    // Force a direct browser navigation
-    window.location.href = '/login';
-  }
-
-  return (
-    <nav className="navbar">
-      <Link to={isLoggedIn ? '/dashboard' : '/'} className="nav-logo">AI Phone Service</Link>
-      <div className="nav-links">
-        {isLoggedIn ? (
-          <button 
-            onClick={logoutAndRedirect}
-            style={{
-              backgroundColor: 'transparent',
-              color: '#6b46c1', // Purple color
-              border: '2px solid #6b46c1',
-              padding: '0.5rem 1.5rem',
-              borderRadius: '0.5rem',
-              fontSize: '1rem',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              marginLeft: '0.5rem'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 6px rgba(107, 114, 128, 0.3)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            Logout
-          </button>
-        ) : (
-          <Link 
-            to="/login" 
-            className="login-button"
-            style={{
-              transition: 'box-shadow 0.3s ease',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.boxShadow = '0 4px 6px rgba(107, 114, 128, 0.3)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            Login
-          </Link>
-        )}
-      </div>
-    </nav>
-  );
+// Layout component without the navigation bar
+function Layout() {
+  return <Outlet />;
 }
 
 function HomePage() {
   return (
     <main className="landing-page">
+      <div className="landing-nav">
+        <div className="landing-brand">Helpr</div>
+        <Link to="/login" className="landing-login">Login</Link>
+      </div>
+      
       <div className="hero-section">
         <h1 className="hero-title">AI-Powered Customer Service</h1>
         <p className="hero-subtitle">Transform your phone support with intelligent, website-aware AI that understands your business</p>
@@ -115,11 +63,12 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <NavBar />
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/dashboard/*" element={<Dashboard />} />
+          </Route>
         </Routes>
       </div>
     </Router>

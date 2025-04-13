@@ -19,6 +19,9 @@ const unresolvedQuestions = [
 function Interactions() {
   return (
     <div className="website-dashboard">
+      <div className="tech-web-corner top-left"></div>
+      <div className="tech-web-corner bottom-right"></div>
+      
       <div className="dashboard-header">
         <h1 className="dashboard-title">Customer Interactions</h1>
         <p className="dashboard-subtitle">Monitor and manage customer interactions</p>

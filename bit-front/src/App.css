@@ -10,9 +10,22 @@
   --grey-800: #1f2937;
   --grey-900: #111827;
   --white: #FFFFFF;
-  --accent-light: #f3f4f6;
-  --accent-medium: #9ca3af;
-  --accent-dark: #4b5563;
+  --accent-light: #e6eeff;
+  --accent-medium: #4a5568;
+  --accent-dark: #2d3748;
+  --purple-primary: #2d3748;
+  --purple-light: #4a5568;
+  --purple-dark: #1a202c;
+}
+
+html, body {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
 }
 
 .App {
@@ -23,7 +36,7 @@
 
 .navbar {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   padding: 1rem 2.5%;
   background-color: var(--white);
@@ -97,7 +110,7 @@ h1 {
   border: none;
   padding: 1rem 2rem;
   border-radius: 0.5rem;
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -143,7 +156,7 @@ h1 {
 
 .login-button {
   background-color: var(--purple-primary);
-  color: var(--white);
+  color: var(--accent-dark);
   border: 2px solid var(--purple-primary);
   padding: 0.5rem 1.5rem;
   border-radius: 0.5rem;
@@ -169,8 +182,8 @@ h1 {
   background-color: var(--white);
   padding: 2.5rem;
   border-radius: 1rem;
-  box-shadow: 0 8px 30px rgba(107, 70, 193, 0.2), 
-              0 4px 12px rgba(107, 70, 193, 0.15);
+  box-shadow: 0 10px 40px rgba(209, 213, 219, 0.4),
+              0 6px 20px rgba(209, 213, 219, 0.3);
   width: 100%;
   max-width: 400px;
 }
@@ -190,7 +203,7 @@ h1 {
 }
 
 .login-form button {
-  background-color: var(--purple-primary);
+  background-color: var(--accent-dark);
   color: var(--white);
   border: none;
   padding: 1rem;
@@ -240,12 +253,18 @@ h1 {
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-left: 0.5rem;
+  margin-left: 2rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+  position: relative;
+  z-index: 5;
 }
 
 .logout-button:hover {
-  background-color: var(--purple-primary);
+  background-color: var(--grey-600);
   color: var(--white);
+  opacity: 1;
+  visibility: visible;
 }
 
 .dashboard-container {
@@ -256,24 +275,53 @@ h1 {
 
 .dashboard-nav {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
   background-color: white;
-  padding: 1rem 0;
+  padding: 1rem 2rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   position: sticky;
   top: 0;
   z-index: 10;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nav-brand {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--grey-900);
+  flex-shrink: 0;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.nav-items {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-item {
   color: var(--grey-600);
   text-decoration: none;
-  padding: 0.75rem 1.5rem;
-  margin: 0 0.5rem;
+  padding: 0.75rem 1rem;
+  margin: 0 0.25rem;
   font-weight: 500;
   transition: color 0.3s ease;
   position: relative;
   background-color: transparent;
+}
+
+.nav-right {
+  flex-shrink: 0;
+  margin-left: auto;
+  position: relative;
+  z-index: 5;
 }
 
 .nav-item:hover {
@@ -516,27 +564,36 @@ h1 {
 .resources-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding-top: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 .resource-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.15rem 0.35rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
   background-color: white;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.5rem;
   border: none;
-  height: 24px;
 }
 
 .resource-info {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
 }
 
 .resource-name {
@@ -659,11 +716,12 @@ h1 {
   width: 100%;
   background: white;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .website-dashboard::before {
@@ -811,10 +869,14 @@ h1 {
   gap: 1.5rem;
   max-width: 1000px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .grid-item {
   width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 1rem;
@@ -850,25 +912,27 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--grey-200);
 }
 
 .card-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  background: linear-gradient(to right, var(--grey-900), var(--grey-700));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--grey-900);
+  margin: 0;
+  text-align: left;
 }
 
 .card-badge {
-  background: var(--grey-100);
+  font-size: 0.75rem;
+  color: var(--grey-600);
+  background-color: var(--grey-100);
   padding: 0.25rem 0.75rem;
   border-radius: 1rem;
-  font-size: 0.875rem;
-  color: var(--grey-600);
+  font-weight: 500;
 }
 
 .modern-form {
@@ -1022,12 +1086,12 @@ h1 {
 .hero-section {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 8rem 2rem;
+  padding: 10rem 2rem;
   text-align: center;
 }
 
 .hero-title {
-  font-size: 4rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: var(--grey-900);
   margin-bottom: 1.5rem;
@@ -1036,10 +1100,10 @@ h1 {
 }
 
 .hero-subtitle {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   color: var(--grey-600);
-  max-width: 800px;
-  margin: 0 auto 3rem;
+  max-width: 700px;
+  margin: 0 auto 2rem;
   line-height: 1.5;
 }
 
@@ -1049,7 +1113,7 @@ h1 {
   border: none;
   padding: 1.25rem 2.5rem;
   border-radius: 0.75rem;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -1075,13 +1139,13 @@ h1 {
 }
 
 .stat-number {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: var(--grey-900);
 }
 
 .stat-label {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--grey-600);
   font-weight: 500;
 }
@@ -1115,7 +1179,7 @@ h1 {
 }
 
 .feature-card h3 {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   color: var(--grey-900);
   margin-bottom: 1rem;
   font-weight: 600;
@@ -1124,12 +1188,13 @@ h1 {
 .feature-card p {
   color: var(--grey-600);
   line-height: 1.6;
+  font-size: 0.95rem;
 }
 
 .login-submit-button {
-  background-color: var(--grey-800);
-  color: var(--white);
-  border: none;
+  background-color: #333; /* Dark grey for visibility */
+  color: #fff; /* White text */
+  border: 2px solid #fff; /* White border for visibility */
   padding: 1rem;
   border-radius: 0.5rem;
   font-size: 1rem;
@@ -1137,12 +1202,6 @@ h1 {
   cursor: pointer;
   width: 100%;
   transition: all 0.2s ease;
-}
-
-.login-submit-button:hover {
-  background-color: var(--grey-900);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .metrics-grid {
@@ -1285,8 +1344,24 @@ h1 {
 }
 
 /* Company Information Form Styling */
+.company-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
 .company-info .form-group {
-  margin-bottom: 1.5rem;
+  width: 100%;
   text-align: left;
 }
 
@@ -1863,5 +1938,164 @@ h1 {
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
+}
+
+/* Add these styles to fix the horizontal scrollbar */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.nav-logo-button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--purple-primary, #6b46c1);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.3s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.nav-logo-button:hover {
+  color: var(--purple-light, #805ad5);
+}
+
+.edge-circle {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 1000; /* Ensure it appears above other elements */
+}
+
+/* Target the specific container for resources */
+.grid-item.resources-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Ensure dashboard grid doesn't impose different widths */
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Tech Corner Design with Fading Pattern - No Grid */
+.tech-web-corner {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  pointer-events: none;
+  z-index: 1; /* Reduced to ensure it stays below navbar */
+}
+
+.tech-web-corner.top-left {
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, rgba(10, 15, 50, 0.5) 0%, transparent 70%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  opacity: 0.9;
+}
+
+.tech-web-corner.bottom-right {
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(315deg, rgba(10, 15, 50, 0.5) 0%, transparent 70%);
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+  opacity: 0.9;
+}
+
+/* Subtle pulse animation */
+.tech-web-corner {
+  animation: cornerPulse 6s ease-in-out infinite;
+}
+
+@keyframes cornerPulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Add these styles for the login header and brand link */
+.login-header {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 5;
+}
+
+.brand-link {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--grey-900);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.brand-link:hover {
+  color: var(--purple-primary);
+}
+
+/* Navigation styling for landing page */
+.landing-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 3.5rem; /* Increased horizontal padding */
+  width: 100%;
+  box-sizing: border-box; /* Ensure padding is included in width */
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.landing-brand {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--grey-900);
+}
+
+.landing-login {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--grey-900);
+  text-decoration: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  margin-right: 1rem; /* Add some margin on the right */
+}
+
+.landing-login:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--purple-primary);
+}
+
+/* Adjust hero section spacing to accommodate the nav */
+.hero-section {
+  padding-top: 10rem;
 }
 
