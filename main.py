@@ -10,6 +10,12 @@ from google import genai
 from google.genai import types
 import chromadb
 import json
+from collections import defaultdict
+from fastapi.middleware.cors import CORSMiddleware
+
+seen = set()
+
+list_of_question = defaultdict(int)
 
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
 
@@ -17,8 +23,8 @@ chroma_collection = chroma_client.get_or_create_collection("embeddings_for_searc
 
 dotenv.load_dotenv("project.env")
 
-ELEVEN_LABS_KEY = "sk_491b13a2d71ee22d03470c63bf25b8ec98c6c3907a9e4cd4"
-GEMINI_API_KEY = "AIzaSyBc1wdarNm6KdiEH1IQOLmbyewq1Hn-rHw"
+ELEVEN_LABS_KEY = "sk_cbed95c7df787f3f64b9e1f1e3a77e8182e2dda7d5f021b2"
+GEMINI_API_KEY = "AIzaSyB8vYIeQ0zcvx-r8_uLc3xgmUITduHBYoU"
 
 # Check if API key is available
 if not ELEVEN_LABS_KEY:
@@ -30,9 +36,50 @@ gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://e0a7-65-113-61-98.ngrok-free.app", "http://localhost:8000", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
+
+def delete_all_embeddings():
+    chroma_client.delete_collection("embeddings_for_search")
+    chroma_client.get_or_create_collection("embeddings_for_search")
+    list_of_question.clear()
+
+
+def add_embedding(text):
+    chroma_collection.add(ids=[str(len(seen))], embeddings=[create_embedding(text)], metadatas=[{"text": text}])
+    
+def search_similar(query):
+    query_vector = create_embedding(query)
+    results = chroma_collection.query(query_embeddings=[query_vector], n_results=10)
+    # return [hit["text"] for hit in results["metadatas"][0], results]
+    return results
+
+@app.post("/add_question")
+def add_question(question: str):
+    # check if the question is already in the list by using the search_similar function and seeing if the similarity is greater than 0.8
+    results = search_similar(question)
+    if 1 - results["distances"][0] < 0.8:
+        list_of_question[question] = 1
+        return {"message": "Question added successfully"}
+    else:
+        list_of_question[question] += 1
+        return {"message": "Question already exists"}
+    
+@app.post("/get_list_of_question")
+def get_list_of_question():
+    return list_of_question
+    
 
 @app.post("/replace_first_message_and_system_prompt")
-def replace_first_message_and_system_prompt(name_of_company: str):
+async def replace_first_message_and_system_prompt(name_of_company: str):
     # return [
     #     f"Hello, I'm mandy from {name_of_company} how can I help you today?",
     #     f"You are a helpful assistant for {name_of_company}, You are given a index that you can RAG from to check different information and from there. You can answer general questions like 'what does {name_of_company} do?' without querying the index but if there is something that you need to know, you can query the index. If you cannot find the information you can say that. "
@@ -42,7 +89,7 @@ def replace_first_message_and_system_prompt(name_of_company: str):
         agent_id="av48KozJHOIl1bWHmjuE",
         conversation_config = {
             "agent": {
-                "first_message": f"Hello, I'm mandy from {name_of_company} how can I help you today?",
+                "first_message": f"Hello, I'm Maya from {name_of_company} how can I help you today?",
                 "prompt": {
                     "prompt": f"You are a helpful customer service agent for {name_of_company}, You are given a index that you can RAG from to check different information and from there. You can answer general questions like 'what does {name_of_company} do?' without querying the index but if there is something that you need to know, you can query the index. If you cannot find the information you can say that. "
                 }
@@ -204,7 +251,6 @@ class PerplexityQuery(BaseModel):
     query: str
     url: str
 
-@app.post("/create_embedding")
 def create_embedding(query: str):
 
 
@@ -213,8 +259,8 @@ def create_embedding(query: str):
             contents=query,
             config=types.EmbedContentConfig(task_type="SEMANTIC_SIMILARITY")
     )
-    print(result.embeddings)
-
+    print(result.embeddings[0].values)
+    return result.embeddings[0].values
 @app.post("/search_perplexity")
 def search_perplexity(query: PerplexityQuery):
     initial_time = time.time()
@@ -245,7 +291,7 @@ def search_perplexity(query: PerplexityQuery):
         "web_search_options": {"search_context_size": "high"}
     }
     headers = {
-        "Authorization": "Bearer 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",
+        "Authorization": "Bearer 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",
         "Content-Type": "application/json"
     }
 
@@ -327,7 +373,7 @@ async def update_webhook_url_constant(new_url: str):
         # But preserve all other tools
         tools = []
         for tool in agent_info.conversation_config.agent.prompt.tools:
-            if tool.type == "webhook":
+            if tool.type == "webhook" and tool.name == "search-perplexity":
                 # Replace with our modified webhook tool
                 tools.append({
                     "id": webhook_tool.id,
@@ -372,13 +418,35 @@ async def update_webhook_url_constant(new_url: str):
         print(f"Error: {str(e)}")
         print(traceback.format_exc())
         return {"error": str(e), "traceback": traceback.format_exc()}
+    
+class UpdateConstants(BaseModel):
+    new_url: str
+    name_of_company: str
 
+@app.post("/update_constants")
+async def update_constants(constants: UpdateConstants):
+    try:
+        await update_webhook_url_constant(constants.new_url)
+        await replace_first_message_and_system_prompt(constants.name_of_company)
+        return {"message": "Successfully updated information. "}
+    except Exception as e:
+        return HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/get_conversations")
+async def get_conversations():
+    response = eleven_labs_client.conversational_ai.get_conversations(
+        agent_id="av48KozJHOIl1bWHmjuE"
+    )
+    
+    return response
 if __name__ == "__main__":
     # asyncio.run(set_url_company_knowledge_base(SetUrlCompanyKnowledgeBase(url="https://www.ikea.com/us/en/", company_name="Ikea")))
     # print(asyncio.run(get_agent_info()))
     # answer = search_perplexity(query="What time does the IKEA store on baltimore avenue in Maryland open and close?")
     # print("\nJust the answer:", answer)
-    # create_embedding(query="What time does the IKEA store on baltimore avenue in Maryland open and close?")
+    # add_embedding(text="What time does the IKEA store on baltimore avenue in Maryland open and close?")
+    print(search_similar(query="Is the IKEA store on baltimore avenue in Maryland closed today?"))
     # print(asyncio.run(set_agent_dynamic_variables(SetAgentDynamicVariables(company_name="Peraton", company_url="https://www.peraton.com/"))))
-    print(replace_first_message_and_system_prompt(name_of_company="McDonalds"))
-    print(asyncio.run(update_webhook_url_constant(new_url="https://www.mcdonalds.com/")))
+    # print(asyncio.run(replace_first_message_and_system_prompt(name_of_company="Major League Hacking")))
+    # print(asyncio.run(update_webhook_url_constant(new_url="https://mlh.io/")))
+    # print(asyncio.run(get_conversations()))
